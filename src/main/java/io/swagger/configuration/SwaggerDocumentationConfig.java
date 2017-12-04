@@ -10,20 +10,19 @@ import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
-@javax.annotation.Generated(value = "class io.swagger.codegen.languages.SpringCodegen", date = "2017-02-22T11:32:19.455Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-04T17:16:42.628Z")
 
 @Configuration
 public class SwaggerDocumentationConfig {
 
     ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-            .title("GiraphJobServer API")
-            .description("This is a simple API to interact with GiraphJobServer and get, through calls, some of most important informations about a generic GiraphJob saved in HDFS.")
+            .title("GiraphWebServer API")
+            .description("Simple API to interact with GiraphJobServer and get some of most important information about a specific job.")
             .license("")
-            .licenseUrl("")
+            .licenseUrl("http://unlicense.org")
             .termsOfServiceUrl("")
             .version("1.1.0")
-            .contact(new Contact("","", "mariaelisa.ganci@gmail.com"))
             .build();
     }
 
@@ -33,8 +32,8 @@ public class SwaggerDocumentationConfig {
                 .select()
                     .apis(RequestHandlerSelectors.basePackage("io.swagger.api"))
                     .build()
-                .directModelSubstitute(org.joda.time.LocalDate.class, java.sql.Date.class)
-                .directModelSubstitute(org.joda.time.DateTime.class, java.util.Date.class)
+                .directModelSubstitute(org.threeten.bp.LocalDate.class, java.sql.Date.class)
+                .directModelSubstitute(org.threeten.bp.OffsetDateTime.class, java.util.Date.class)
                 .apiInfo(apiInfo());
     }
 

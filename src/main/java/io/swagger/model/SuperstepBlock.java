@@ -35,7 +35,10 @@ public class SuperstepBlock   {
 
 	@JsonProperty("timeIndex")
 	private Double timeIndex = null;
-	
+
+	@JsonProperty("latencies")
+	private List<Latency> latencies = new ArrayList<Latency>();
+
 	public SuperstepBlock scale(String scale) {
 		this.scale = scale;
 		return this;
@@ -114,26 +117,26 @@ public class SuperstepBlock   {
 	}
 
 	/**
-	 * Get lenght
-	 * @return lenght
+	 * Get length
+	 * @return length
 	 **/
 	@ApiModelProperty(example = "2000 (ms)", required = true, value = "")
 	public Double getDuration() {
 		return duration;
 	}
 
-	public void setDuration(Double lenght) {
-		this.duration = lenght;
+	public void setDuration(Double length) {
+		this.duration = length;
 	}
-	
+
 	public SuperstepBlock timeIndex(Double length) {
 		this.duration = length;
 		return this;
 	}
 
 	/**
-	 * Get lenght
-	 * @return lenght
+	 * Get timeIndex
+	 * @return timeIndex
 	 **/
 	@ApiModelProperty(example = "2000 (ms)", required = true, value = "")
 	public Double getTimeIndex() {
@@ -167,6 +170,29 @@ public class SuperstepBlock   {
 		this.edges = edges;
 	}
 
+	public SuperstepBlock latencies(List<Latency> latencies) {
+		this.latencies = latencies;
+		return this;
+	}
+
+	public SuperstepBlock addLatenciesItem(Latency latenciesItem) {
+		this.latencies.add(latenciesItem);
+		return this;
+	}
+
+	/**
+	 * Get latencies
+	 * @return latencies
+	 **/
+	@ApiModelProperty(required = true, value = "")
+	public List<Latency> getLatencies() {
+		return latencies;
+	}
+
+	public void setLatencies(List<Latency> latencies) {
+		this.latencies = latencies;
+	}
+
 
 	@Override
 	public boolean equals(java.lang.Object o) {
@@ -181,7 +207,8 @@ public class SuperstepBlock   {
 				Objects.equals(this.nstep, superstepBlock.nstep) &&
 				Objects.equals(this.numberOfBlock, superstepBlock.numberOfBlock) &&
 				Objects.equals(this.duration, superstepBlock.duration) &&
-				Objects.equals(this.edges, superstepBlock.edges);
+				Objects.equals(this.edges, superstepBlock.edges) &&
+				Objects.equals(this.latencies, superstepBlock.latencies);								
 	}
 
 	@Override
@@ -199,6 +226,7 @@ public class SuperstepBlock   {
 		sb.append("    number: ").append(toIndentedString(numberOfBlock)).append("\n");
 		sb.append("    length: ").append(toIndentedString(duration)).append("\n");
 		sb.append("    edges: ").append(toIndentedString(edges)).append("\n");
+		sb.append("    latencies: ").append(toIndentedString(latencies)).append("\n");		
 		sb.append("}");
 		return sb.toString();
 	}
