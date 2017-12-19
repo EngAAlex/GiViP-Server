@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import io.swagger.annotations.ApiParam;
 import io.swagger.dbconnection.DbUtil;
 import io.swagger.model.BlockDetailsPerElement;
+import io.swagger.model.Computation;
 import io.swagger.model.Edge;
 import io.swagger.model.Latency;
 import io.swagger.model.SuperstepBlock;
@@ -67,6 +68,12 @@ public class SuperstepBlockApiController implements SuperstepBlockApi {
 				+"FROM latencies " 
 				+"WHERE superstepId BETWEEN ? AND ? "
 				+"GROUP BY source, target";
+
+		String computationsCountQuery = "SELECT computation, COUNT(computation) as occurrencies "
+				+"FROM superstepinfo " 
+				+"WHERE superstepId BETWEEN ? AND ? "
+				+"GROUP BY computation";
+		
 		try{
 
 			connection = DriverManager.getConnection(DbUtil.getConnectionStringWithOptionsForDatabase(DbUtil.JOBS_TABLE), DbUtil.getDBUserName(), DbUtil.getDBPassword());
@@ -238,7 +245,25 @@ public class SuperstepBlockApiController implements SuperstepBlockApi {
 				rs.close();
 				st.close();
 
+				//RETRIEVE COMPUTATIONS INFORMATION
+				
+				st = connection.prepareStatement(computationsCountQuery);
 
+				st.setInt(1, start);
+				st.setInt(2, blockCursor);
+
+				st.executeQuery();
+				rs = st.getResultSet();
+				while(rs.next()){
+					Computation cp = new Computation();
+					cp.setClassname(rs.getString(1));
+					cp.setOccurrencies(rs.getInt(2));
+					sb.addComputationsItem(cp);
+				}
+								
+				rs.close();
+				st.close();
+				
 				superstepsBlockList.add(sb);
 
 				start += blockSize;
