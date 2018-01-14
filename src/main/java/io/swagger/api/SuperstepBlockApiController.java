@@ -66,7 +66,7 @@ public class SuperstepBlockApiController implements SuperstepBlockApi {
 		
 		String aggregateLatencyQuery = "SELECT source, target, AVG(latency) AS latency "
 				+"FROM latencies " 
-				+"WHERE superstepId BETWEEN ? AND ? "
+				+"WHERE id_superstep BETWEEN ? AND ? "
 				+"GROUP BY source, target";
 
 		String computationsCountQuery = "SELECT computation, COUNT(computation) as occurrencies "
