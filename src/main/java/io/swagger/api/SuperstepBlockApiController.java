@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import io.swagger.annotations.ApiParam;
 import io.swagger.dbconnection.DbUtil;
 import io.swagger.model.BlockDetailsPerElement;
+import io.swagger.model.Computation;
 import io.swagger.model.Edge;
+import io.swagger.model.Latency;
 import io.swagger.model.SuperstepBlock;
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.SpringCodegen", date = "2017-02-22T11:32:19.455Z")
@@ -57,11 +59,21 @@ public class SuperstepBlockApiController implements SuperstepBlockApi {
 				+ "WHERE superstepId BETWEEN ? AND ?";
 
 
-		String aggregateSuperstep = "SELECT source, target, SUM(nMessages) AS totMessages, SUM(bytes) AS totBytes "
+		String aggregateSuperstepQuery = "SELECT source, target, SUM(nMessages) AS totMessages, SUM(bytes) AS totBytes "
 				+"FROM messages_by_"+ scale + " " 
 				+"WHERE superstepId BETWEEN ? AND ? "
 				+"GROUP BY source, target";
+		
+		String aggregateLatencyQuery = "SELECT source, target, AVG(latency) AS latency "
+				+"FROM latencies " 
+				+"WHERE id_superstep BETWEEN ? AND ? "
+				+"GROUP BY source, target";
 
+		String computationsCountQuery = "SELECT computation, COUNT(computation) as occurrencies "
+				+"FROM superstepinfo " 
+				+"WHERE superstepId BETWEEN ? AND ? "
+				+"GROUP BY computation";
+		
 		try{
 
 			connection = DriverManager.getConnection(DbUtil.getConnectionStringWithOptionsForDatabase(DbUtil.JOBS_TABLE), DbUtil.getDBUserName(), DbUtil.getDBPassword());
@@ -127,7 +139,7 @@ public class SuperstepBlockApiController implements SuperstepBlockApi {
 				rs.close();
 				st.close();
 
-				st = connection.prepareStatement(aggregateSuperstep);
+				st = connection.prepareStatement(aggregateSuperstepQuery);
 
 				//				st.setString(1, "messages_by_"+scale);
 				st.setInt(1, start);
@@ -212,7 +224,46 @@ public class SuperstepBlockApiController implements SuperstepBlockApi {
 
 				rs.close();
 				st.close();
+				
+				//RETRIEVE LATENCIES DATA
+				
+				st = connection.prepareStatement(aggregateLatencyQuery);
 
+				st.setInt(1, start);
+				st.setInt(2, blockCursor);
+
+				st.executeQuery();
+				rs = st.getResultSet();
+				while(rs.next()){
+					Latency ly = new Latency();
+					ly.setSource(rs.getString(1));
+					ly.setTarget(rs.getString(2));
+					ly.setLatency(rs.getInt(3));
+					sb.addLatenciesItem(ly);					
+				}
+								
+				rs.close();
+				st.close();
+
+				//RETRIEVE COMPUTATIONS INFORMATION
+				
+				st = connection.prepareStatement(computationsCountQuery);
+
+				st.setInt(1, start);
+				st.setInt(2, blockCursor);
+
+				st.executeQuery();
+				rs = st.getResultSet();
+				while(rs.next()){
+					Computation cp = new Computation();
+					cp.setClassname(rs.getString(1));
+					cp.setOccurrencies(rs.getInt(2));
+					sb.addComputationsItem(cp);
+				}
+								
+				rs.close();
+				st.close();
+				
 				superstepsBlockList.add(sb);
 
 				start += blockSize;
